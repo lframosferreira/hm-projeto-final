@@ -34,6 +34,14 @@ void Graph::add_edge(int u, int v, bool directed) {
   }
 }
 
+adj_list_t  Graph::get_adjacency_list(){
+  return this->adjacency_list;
+}
+
+int  Graph::get_number_of_vertices(){
+  return this->number_of_vertices;
+}
+
 void Graph::print_to_stdout() {
   for (int i = 1; i <= this->number_of_vertices; i++) {
     std::cout << i << std::endl;
