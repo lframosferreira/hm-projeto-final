@@ -479,3 +479,5 @@ CMakeUserPresets.json
 # External projects
 *-prefix/
 
+
+scratch.cpp

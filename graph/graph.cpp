@@ -4,73 +4,173 @@
 #include <iostream>
 #include <sstream>
 
-Graph::Graph() {
+Graph::Graph()
+{
   this->set_number_of_vertices(0);
   this->set_number_of_edges(0);
 }
 
-Graph::Graph(int number_of_vertices) {
+Graph::Graph(int number_of_vertices)
+{
   this->set_number_of_vertices(number_of_vertices);
   this->set_number_of_edges(0);
 }
 
-void Graph::set_number_of_vertices(int number_of_vertices) {
+void Graph::set_number_of_vertices(int number_of_vertices)
+{
   this->number_of_vertices = number_of_vertices;
-  this->adjacency_list.resize(number_of_vertices + 1);
+  this->adjacency_list.resize(number_of_vertices);
+  this->adjacency_matrix.resize(number_of_vertices, std::vector<bool>(number_of_vertices, false));
 }
 
-void Graph::set_number_of_edges(int number_of_edges) {
+void Graph::set_number_of_edges(int number_of_edges)
+{
   this->number_of_edges = number_of_edges;
 }
 
-void Graph::add_edge(int u, int v, bool directed) {
+void Graph::add_edge(int u, int v, bool directed)
+{
   assert(this->number_of_vertices >= u and this->number_of_vertices >= v and
          "Can't add edge if there are not enough vertices");
-  if (directed) {
+  if (directed)
+  {
     this->adjacency_list.at(u).push_back(v);
-  } else {
+  }
+  else
+  {
     this->adjacency_list.at(u).push_back(v);
     this->adjacency_list.at(v).push_back(u);
   }
 }
 
-void Graph::print_to_stdout() {
-  for (int i = 1; i <= this->number_of_vertices; i++) {
-    std::cout << i << std::endl;
-    for (auto &neighbour : this->adjacency_list.at(i)) {
+void Graph::print_to_stdout()
+{
+  for (int i = 0; i < this->number_of_vertices; i++)
+  {
+    std::cout << "Vértice: " << i << "; vizinhos: " << this->adjacency_list.at(i).size() << std::endl;
+    /* for (auto &neighbour : this->adjacency_list.at(i))
+    {
       std::cout << neighbour << " ";
-    }
+    } */
     std::cout << std::endl;
   }
 }
 
-Graph parse_from_dimacs(const std::string &filename) {
+int Graph::get_number_of_vertices() const { return this->number_of_vertices; }
 
-  Graph graph;
+bool Graph::is_edge(int u, int v) const
+{
+  return this->adjacency_matrix.at(u).at(v);
+}
+
+void Graph::read_edge_list(const std::string &filename)
+{
   std::ifstream input(filename);
   std::string line;
-  while (std::getline(input, line)) {
+  int number_of_vertices = 0, number_of_edges;
+  while (std::getline(input, line))
+  {
     if (line.at(0) == 'c')
       continue;
-    if (line.at(0) == 'p') {
+    if (line.at(0) == 'p')
+    {
       // parse number of vertices
       char c;
       std::string col;
-      int number_of_vertices, number_of_edges;
       std::istringstream iss(line);
       iss >> c >> col >> number_of_vertices >> number_of_edges;
-      graph.set_number_of_vertices(number_of_vertices);
+      this->set_number_of_vertices(number_of_vertices);
       continue;
     }
-    if (line.at(0) == 'e') {
+    if (line.at(0) == 'e')
+    {
       char c;
       int u, v;
       std::istringstream iss(line);
       iss >> c >> u >> v;
-      graph.add_edge(u, v);
+      assert(u <= number_of_vertices and v <= number_of_vertices and "Vertex out of bounds");
+      u--;
+      v--;
+      this->add_edge(u, v);
       continue;
     }
   }
+  sort_adjacency_list();
+  build_adjacency_matrix();
   input.close();
-  return graph;
+}
+
+void Graph::sort_adjacency_list()
+{
+  std::vector<std::pair<std::vector<int>, int>> indexed_list;
+  for (size_t i = 0; i < this->adjacency_list.size(); ++i)
+  {
+    indexed_list.emplace_back(this->adjacency_list[i], i);
+  }
+
+  std::sort(indexed_list.begin(), indexed_list.end(),
+            [](const std::pair<std::vector<int>, int> &a, const std::pair<std::vector<int>, int> &b)
+            {
+              return a.first.size() > b.first.size();
+            });
+
+  for (size_t i = 0; i < indexed_list.size(); ++i)
+  {
+    this->adjacency_list[i] = indexed_list[i].first;
+    this->index2label.push_back(indexed_list[i].second);
+  }
+}
+
+void Graph::build_adjacency_matrix()
+{
+  for (size_t i = 0; i < this->adjacency_list.size(); ++i)
+  {
+    for (auto &neighbour : this->adjacency_list[i])
+    {
+      this->adjacency_matrix[i][neighbour] = true;
+    }
+  }
+}
+
+Graph Graph::get_subgraph(std::vector<int> vertices) const
+{
+  Graph subgraph(vertices.size());
+  for (size_t i = 0; i < vertices.size(); ++i)
+  {
+    for (size_t j = i + 1; j < vertices.size(); ++j)
+    {
+      if (this->is_edge(vertices[i], vertices[j]))
+      {
+        subgraph.add_edge(i, j);
+      }
+    }
+  }
+  subgraph.sort_adjacency_list();
+  subgraph.build_adjacency_matrix();
+  return subgraph;
+}
+
+void Graph::remove_vertex(int vertex)
+{
+  for (auto &neighbour : this->adjacency_list[vertex])
+  {
+    this->adjacency_list[neighbour].erase(std::remove(this->adjacency_list[neighbour].begin(), this->adjacency_list[neighbour].end(), vertex), this->adjacency_list[neighbour].end());
+    this->adjacency_matrix[vertex].erase(std::remove(this->adjacency_matrix[vertex].begin(), this->adjacency_matrix[vertex].end(), true), this->adjacency_matrix[vertex].end());
+  }
+  this->adjacency_list[vertex].clear();
+}
+
+int Graph::get_vertex_with_lowest_degree()
+{
+  int min_degree = this->get_number_of_vertices();
+  int vertex = -1;
+  for (int i = 0; i < this->get_number_of_vertices(); ++i)
+  {
+    if (this->adjacency_list[i].size() < min_degree)
+    {
+      min_degree = this->adjacency_list[i].size();
+      vertex = i;
+    }
+  }
+  return vertex;
 }
