@@ -199,7 +199,7 @@ std::vector<int> GeneticAlgorithm::run()
     std::cout << "Number of vertices: " << num_vertices << std::endl;
     // Initialize population
     population.clear();
-    population.reserve(population_size);
+    population.resize(population_size);
     auto start = std::chrono::high_resolution_clock::now();
     #pragma omp parallel for
     for (int i = 0; i < population_size; ++i) {
@@ -214,7 +214,6 @@ std::vector<int> GeneticAlgorithm::run()
     for (int generation = 0; generation < generations; ++generation)
     {
         std::cout << "Generation " << generation << std::endl;
-        std::cout << "fitness 0: " << fitness(population[0]) << std::endl;
         next_generation();
     }
     std::bitset<NUM_MAX_VERTICES> best_individual;
