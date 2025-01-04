@@ -24,6 +24,7 @@ int GeneticAlgorithm::fitness(const std::bitset<NUM_MAX_VERTICES> &ind)
         if (ind[i])
             vertices.push_back(i);
     }
+    assert(is_clique(vertices) and "ERROR: Invalid clique");
     return is_clique(vertices) ? vertices.size() : 0;
 }
 
@@ -96,6 +97,8 @@ void GeneticAlgorithm::generate_offspring(std::vector<std::bitset<NUM_MAX_VERTIC
         {
             mutate(child2);
         }
+        repair_clique(child1);
+        repair_clique(child2);
         prev_population.push_back(child1);
         prev_population.push_back(child2);
     }
@@ -144,7 +147,45 @@ void GeneticAlgorithm::next_generation()
 
 void GeneticAlgorithm::repair_clique(std::bitset<NUM_MAX_VERTICES> &individual)
 {
-    
+    std::vector<int> vertices;
+    for (int i = 0; i < graph.get_number_of_vertices(); ++i)
+    {
+        if (individual[i])
+            vertices.push_back(i);
+    }
+    std::map<int, std::vector<int>> neighbours;
+    for (size_t i = 0; i < vertices.size(); ++i)
+    {
+        for (size_t j = i + 1; j < vertices.size(); ++j)
+        {
+            if (!graph.is_edge(vertices[i], vertices[j]))
+            {
+                neighbours[vertices[i]].push_back(vertices[j]);
+                neighbours[vertices[j]].push_back(vertices[i]);
+            }
+        }
+    }
+    while (!is_clique(vertices))
+    {
+        int min_degree = graph.get_number_of_vertices();
+        int vertex_to_remove = -1;
+        for (const auto &[vertex, neighbour_list] : neighbours)
+        {
+            if (neighbour_list.size() < min_degree)
+            {
+                min_degree = neighbour_list.size();
+                vertex_to_remove = vertex;
+            }
+        }
+        assert(vertex_to_remove != -1 and "ERROR: No vertex to remove");
+        individual[vertex_to_remove] = 0;
+        vertices.erase(std::remove(vertices.begin(), vertices.end(), vertex_to_remove), vertices.end());
+        neighbours.erase(vertex_to_remove);
+        for (auto &[vertex, neighbour_list] : neighbours)
+        {
+            neighbour_list.erase(std::remove(neighbour_list.begin(), neighbour_list.end(), vertex_to_remove), neighbour_list.end());
+        }
+    }
 }
 
 // Constructor: Initializes the genetic algorithm with the given graph, population size, mutation rate, and number of generations
@@ -158,10 +199,15 @@ std::vector<int> GeneticAlgorithm::run()
     std::cout << "Number of vertices: " << num_vertices << std::endl;
     // Initialize population
     population.clear();
-    for (int i = 0; i < population_size; ++i)
-    {
-        population.push_back(random_individual(num_vertices));
+    population.reserve(population_size);
+    auto start = std::chrono::high_resolution_clock::now();
+    #pragma omp parallel for
+    for (int i = 0; i < population_size; ++i) {
+        population[i] = random_individual(num_vertices);
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    std::cout << "Initialization time: " << elapsed_seconds.count() << "s" << std::endl;
     std::cout << "Population size: " << population.size() << std::endl;
 
     // Evolution loop

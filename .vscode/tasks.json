@@ -6,12 +6,37 @@
             "type": "shell",
             "command": "g++",
             "args": [
-                "-g", "./src/main.cpp", "./ga/ga.cpp", "./graph/graph.cpp", "-o", "main"
+                "-g",
+                "./src/main.cpp",
+                "./ga/ga.cpp",
+                "./graph/graph.cpp",
+                "-o",
+                "main"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++.exe arquivo de build ativo",
+            "command": "C:/msys64/ucrt64/bin/g++.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "C:/msys64/ucrt64/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
             ],
             "group": {
-            "kind": "build",
+                "kind": "build",
                 "isDefault": true
-            }
+            },
+            "detail": "Tarefa gerada pelo Depurador."
         }
     ]
 }

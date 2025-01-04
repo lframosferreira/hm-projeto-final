@@ -3,6 +3,9 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+
+using adj_list_t = std::vector<std::vector<int>>;
+
 class Graph
 {
 
@@ -29,6 +32,9 @@ public:
   int get_vertex_with_lowest_degree();
   void remove_vertex(int vertex);
   void print_to_stdout();
+  std::vector<std::vector<int>> get_adjacency_list() const;
 };
 
 constexpr int NUM_MAX_VERTICES = 3500;
+
+#endif

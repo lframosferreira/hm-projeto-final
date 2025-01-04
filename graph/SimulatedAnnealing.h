@@ -5,6 +5,7 @@
 #include <vector>
 #include <random>
 
+
 class SimulatedAnnealing {
 private:
     double initialTemperature;

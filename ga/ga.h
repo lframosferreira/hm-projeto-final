@@ -5,7 +5,11 @@
 #include <vector>
 #include <random>
 #include "../graph/graph.h"
+#include <cassert>
 #include <set>
+#include <map>
+#include <chrono>
+#include <omp.h>
 
 class GeneticAlgorithm
 {

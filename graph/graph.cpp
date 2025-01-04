@@ -18,6 +18,8 @@ Graph::Graph(int number_of_vertices)
 
 void Graph::set_number_of_vertices(int number_of_vertices)
 {
+  assert(number_of_vertices >= 0 and "Number of vertices must be non-negative");
+  assert(number_of_vertices <= NUM_MAX_VERTICES and "Number of vertices must be less than NUM_MAX_VERTICES");
   this->number_of_vertices = number_of_vertices;
   this->adjacency_list.resize(number_of_vertices);
   this->adjacency_matrix.resize(number_of_vertices, std::vector<bool>(number_of_vertices, false));
@@ -173,4 +175,9 @@ int Graph::get_vertex_with_lowest_degree()
     }
   }
   return vertex;
+}
+
+std::vector<std::vector<int>> Graph::get_adjacency_list() const
+{
+  return this->adjacency_list;
 }
