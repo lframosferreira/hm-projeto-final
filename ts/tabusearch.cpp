@@ -6,35 +6,41 @@
 #include <unordered_set>
 #include <deque>
 
-TabuSearch::TabuSearch(Graph graph, const std::vector<int>& initialSolution, int maxTabuSize, int maxIterations)
-    : graph(graph), currentSolution(initialSolution), bestSolution(initialSolution), 
+TabuSearch::TabuSearch(Graph graph, const std::vector<int> &initialSolution, int maxTabuSize, int maxIterations)
+    : graph(graph), currentSolution(initialSolution), bestSolution(initialSolution),
       maxTabuSize(maxTabuSize), maxIterations(maxIterations) {}
 
-void TabuSearch::run() {
+void TabuSearch::run()
+{
     std::deque<std::vector<int>> tabuList;
     int currentIteration = 0;
-    double bestFitness = computeObjectiveFunction(bestSolution);
+    int bestFitness = computeObjectiveFunction(bestSolution);
 
-    while (currentIteration < maxIterations) {
+    while (currentIteration < maxIterations)
+    {
+        std::cout << "Iteration: " << currentIteration << std::endl;
         std::vector<std::vector<int>> neighborhood = generateNeighborhood(currentSolution, tabuList);
 
-        if (neighborhood.empty()) {
+        if (neighborhood.empty())
+        {
             std::cout << "No neighbors." << std::endl;
             break;
         }
 
         std::vector<int> bestNeighbor = selectBestNeighbor(neighborhood);
-        double neighborFitness = computeObjectiveFunction(bestNeighbor);
+        int neighborFitness = computeObjectiveFunction(bestNeighbor);
 
         currentSolution = bestNeighbor;
 
-        if (neighborFitness > bestFitness) {
+        if (neighborFitness > bestFitness)
+        {
             bestFitness = neighborFitness;
             bestSolution = bestNeighbor;
         }
 
         tabuList.push_back(currentSolution);
-        if (tabuList.size() > maxTabuSize) {
+        if (tabuList.size() > maxTabuSize)
+        {
             tabuList.pop_front();
         }
 
@@ -45,20 +51,23 @@ void TabuSearch::run() {
 }
 
 std::vector<std::vector<int>> TabuSearch::generateNeighborhood(
-    const std::vector<int>& solution, 
-    const std::deque<std::vector<int>>& tabuList
-) {
+    const std::vector<int> &solution,
+    const std::deque<std::vector<int>> &tabuList)
+{
     std::vector<std::vector<int>> neighbors;
     adj_list_t adjacencyList = graph.get_adjacency_list();
 
-    for (int i = 0; i < solution.size(); ++i) {
-        for (int neighbor : adjacencyList[solution[i]]) {
+    for (int i = 0; i < solution.size(); ++i)
+    {
+        for (int neighbor : adjacencyList[solution[i]])
+        {
             std::vector<int> newSolution = solution;
 
             newSolution[i] = neighbor;
 
             if (std::find(tabuList.begin(), tabuList.end(), newSolution) == tabuList.end() &&
-                isClique(newSolution)) {
+                isClique(newSolution))
+            {
                 neighbors.push_back(newSolution);
             }
         }
@@ -67,13 +76,16 @@ std::vector<std::vector<int>> TabuSearch::generateNeighborhood(
     return neighbors;
 }
 
-std::vector<int> TabuSearch::selectBestNeighbor(const std::vector<std::vector<int>>& neighborhood) {
+std::vector<int> TabuSearch::selectBestNeighbor(const std::vector<std::vector<int>> &neighborhood)
+{
     std::vector<int> bestNeighbor = neighborhood.front();
-    double bestFitness = computeObjectiveFunction(bestNeighbor);
+    int bestFitness = computeObjectiveFunction(bestNeighbor);
 
-    for (const auto& neighbor : neighborhood) {
-        double fitness = computeObjectiveFunction(neighbor);
-        if (fitness > bestFitness) {
+    for (const auto &neighbor : neighborhood)
+    {
+        int fitness = computeObjectiveFunction(neighbor);
+        if (fitness > bestFitness)
+        {
             bestFitness = fitness;
             bestNeighbor = neighbor;
         }
@@ -82,28 +94,21 @@ std::vector<int> TabuSearch::selectBestNeighbor(const std::vector<std::vector<in
     return bestNeighbor;
 }
 
-double TabuSearch::computeObjectiveFunction(const std::vector<int>& solution) {
-    double fitness = 0;
-    adj_list_t adjacencyList = graph.get_adjacency_list();
-
-    for (size_t i = 0; i < solution.size(); ++i) {
-        for (size_t j = i + 1; j < solution.size(); ++j) {
-            if (std::find(adjacencyList[solution[i]].begin(), adjacencyList[solution[i]].end(), solution[j]) !=
-                adjacencyList[solution[i]].end()) {
-                fitness += 1;
-            }
-        }
-    }
-
-    return fitness;
+int TabuSearch::computeObjectiveFunction(const std::vector<int> &solution)
+{
+    assert(isClique(solution) && "Solution is not a clique.");
+    return solution.size();
 }
 
-bool TabuSearch::isClique(const std::vector<int>& solution) {
+bool TabuSearch::isClique(const std::vector<int> &solution)
+{
     adj_list_t adjacencyList = graph.get_adjacency_list();
-    for (size_t i = 0; i < solution.size(); ++i) {
-        for (size_t j = i + 1; j < solution.size(); ++j) {
-            if (std::find(adjacencyList[solution[i]].begin(), adjacencyList[solution[i]].end(), solution[j]) ==
-                adjacencyList[solution[i]].end()) {
+    for (size_t i = 0; i < solution.size(); ++i)
+    {
+        for (size_t j = i + 1; j < solution.size(); ++j)
+        {
+            if (!graph.is_edge(solution[i], solution[j]))
+            {
                 return false;
             }
         }
@@ -111,6 +116,7 @@ bool TabuSearch::isClique(const std::vector<int>& solution) {
     return true;
 }
 
-std::vector<int> TabuSearch::getBestSolution() const {
+std::vector<int> TabuSearch::getBestSolution() const
+{
     return bestSolution;
 }

@@ -1,4 +1,5 @@
 #include "../ga/ga.h"
+#include "../ts/tabusearch.h"
 #include <cstdlib>
 #include <string>
 #include <iostream>
@@ -14,9 +15,12 @@ int main(int argc, char **argv)
 
   Graph g;
   g.read_edge_list(filename);
-  GeneticAlgorithm ga(g, 500, 0.9, 0.1, 1000);
+  GeneticAlgorithm ga(g, 100, 0.9, 0.1, 100);
   std::cout << "Running genetic algorithm..." << std::endl;
   std::vector<int> clique = ga.run();
-  std::cout << "Clique size: " << clique.size() << std::endl;
+  std::cout << "Clique size (ga): " << clique.size() << std::endl;
+  TabuSearch ts(g, clique, 10, 100);
+  std::cout << "Running tabu search..." << std::endl;
+  ts.run();
   exit(EXIT_SUCCESS);
 }

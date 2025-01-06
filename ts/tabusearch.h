@@ -4,6 +4,7 @@
 #include "../graph/graph.h"
 #include <vector>
 #include <deque>
+#include <cassert>
 
 class TabuSearch {
 private:
@@ -15,7 +16,7 @@ private:
 
     std::vector<std::vector<int>> generateNeighborhood(const std::vector<int>& solution, const std::deque<std::vector<int>>& tabuList);
     std::vector<int> selectBestNeighbor(const std::vector<std::vector<int>>& neighborhood);
-    double computeObjectiveFunction(const std::vector<int>& solution);
+    int computeObjectiveFunction(const std::vector<int>& solution);
     bool isClique(const std::vector<int>& solution);
 
 public:
