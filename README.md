@@ -1,11 +1,11 @@
 # Heurísticas e Metaheurísticas
+
+## Dependências
+
+- `make`
+- `gcc`
+
 ## Como compilar/executar o programa
-``g++ -g -fopenmp -c src/main.cpp -o src/main.o``
 
-``g++ -g -fopenmp -c ga/ga.cpp -o ga/ga.o``
-
-``g++ -g -fopenmp -c graph/graph.cpp -o graph/graph.o``
-
-``g++ -g -fopenmp -o main src/main.o ga/ga.o graph/graph.o``
-
-``./main ./DIMACS/{nome_arquivo_clique}``
+- `make`: compila o programa e cria o binário `main`
+- `make run clique_file=path_to_clique_file`: roda o programa com o arquivo de entrada passado
