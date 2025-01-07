@@ -23,7 +23,7 @@ void TabuSearch::run()
 
         if (neighborhood.empty())
         {
-            std::cout << "No neighbors." << std::endl;
+            std::cout << "Sem mais vizinhos disponiveis." << std::endl;
             break;
         }
 
@@ -47,7 +47,7 @@ void TabuSearch::run()
         currentIteration++;
     }
 
-    std::cout << "Melhor aptidão encontrada: " << bestFitness << std::endl;
+    std::cout << "Melhor clique encontrada: " << bestFitness << std::endl;
 }
 
 std::vector<std::vector<int>> TabuSearch::generateNeighborhood(
@@ -57,19 +57,31 @@ std::vector<std::vector<int>> TabuSearch::generateNeighborhood(
     std::vector<std::vector<int>> neighbors;
     adj_list_t adjacencyList = graph.get_adjacency_list();
 
-    for (int i = 0; i < solution.size(); ++i)
+    for (int i = 0; i < graph.get_number_of_vertices(); ++i)
     {
-        for (int neighbor : adjacencyList[solution[i]])
+        if (std::find(solution.begin(), solution.end(), i) == solution.end())
         {
             std::vector<int> newSolution = solution;
+            newSolution.push_back(i);
 
-            newSolution[i] = neighbor;
-
-            if (std::find(tabuList.begin(), tabuList.end(), newSolution) == tabuList.end() &&
+            if ((std::find(tabuList.begin(), tabuList.end(), newSolution) == tabuList.end() || 
+                 computeObjectiveFunction(newSolution) > computeObjectiveFunction(bestSolution)) &&
                 isClique(newSolution))
             {
                 neighbors.push_back(newSolution);
             }
+        }
+    }
+
+    for (size_t i = 0; i < solution.size(); ++i)
+    {
+        std::vector<int> newSolution = solution;
+        newSolution.erase(newSolution.begin() + i);
+
+        if (std::find(tabuList.begin(), tabuList.end(), newSolution) == tabuList.end() && 
+            isClique(newSolution))
+        {
+            neighbors.push_back(newSolution);
         }
     }
 
