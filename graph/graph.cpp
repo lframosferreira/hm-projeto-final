@@ -23,6 +23,8 @@ void Graph::set_number_of_vertices(int number_of_vertices)
   this->number_of_vertices = number_of_vertices;
   this->adjacency_list.resize(number_of_vertices);
   this->adjacency_matrix.resize(number_of_vertices, std::vector<bool>(number_of_vertices, false));
+  this->index2label.resize(number_of_vertices);
+  this->label2index.resize(number_of_vertices + 1);
 }
 
 void Graph::set_number_of_edges(int number_of_edges)
@@ -49,12 +51,19 @@ void Graph::print_to_stdout()
 {
   for (int i = 0; i < this->number_of_vertices; i++)
   {
-    std::cout << "Vértice: " << i << "; vizinhos: " << this->adjacency_list.at(i).size() << std::endl;
-    /* for (auto &neighbour : this->adjacency_list.at(i))
+    std::cout << "Vértice: " << this->index2label.at(i) << "; vizinhos: ";
+    for (auto &neighbour : this->adjacency_list.at(i))
     {
-      std::cout << neighbour << " ";
-    } */
+      std::cout << this->index2label.at(neighbour) << " ";
+    }
     std::cout << std::endl;
+  }
+  for (size_t i = 0; i < this->number_of_vertices; i++)
+  {
+    for (size_t j = i + 1; j < this->number_of_vertices; j++)
+    {
+      std::cout << index2label.at(i) << " eh vizinho de " << index2label.at(j) << ": " << (this->is_edge(i, j) ? "Sim" : "Não") << std::endl;
+    }
   }
 }
 
@@ -118,8 +127,16 @@ void Graph::sort_adjacency_list()
 
   for (size_t i = 0; i < indexed_list.size(); ++i)
   {
-    this->adjacency_list[i] = indexed_list[i].first;
-    this->index2label.push_back(indexed_list[i].second);
+    this->index2label[i] = indexed_list[i].second + 1;
+    this->label2index[indexed_list[i].second + 1] = i;
+  }
+  for (auto const [neighbours, label_minus_1] : indexed_list)
+  {
+    this->adjacency_list[this->label2index[label_minus_1 + 1]].clear();
+    for (auto const neighbour : neighbours)
+    {
+      this->adjacency_list[this->label2index[label_minus_1 + 1]].push_back(this->label2index[neighbour + 1]);
+    }
   }
 }
 

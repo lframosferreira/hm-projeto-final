@@ -8,7 +8,7 @@
 
 class TabuSearch {
 private:
-    Graph graph;
+    const Graph &graph;
     std::vector<int> currentSolution;
     std::vector<int> bestSolution;
     int maxTabuSize;
@@ -20,7 +20,7 @@ private:
     bool isClique(const std::vector<int>& solution);
 
 public:
-    TabuSearch(Graph graph, const std::vector<int>& initialSolution, int maxTabuSize, int maxIterations);
+    TabuSearch(const Graph &graph, const std::vector<int>& initialSolution, int maxTabuSize, int maxIterations);
     void run();
     std::vector<int> getBestSolution() const;
 };

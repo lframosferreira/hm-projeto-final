@@ -15,6 +15,7 @@ int main(int argc, char **argv)
 
   Graph g;
   g.read_edge_list(filename);
+  std::cout << filename << std::endl;
   GeneticAlgorithm ga(g, 100, 0.9, 0.1, 100);
   std::cout << "Running genetic algorithm..." << std::endl;
   std::vector<int> clique = ga.run();
@@ -22,5 +23,6 @@ int main(int argc, char **argv)
   TabuSearch ts(g, clique, 10, 100);
   std::cout << "Running tabu search..." << std::endl;
   ts.run();
+  std::cout << "Done" << std::endl;
   exit(EXIT_SUCCESS);
 }
