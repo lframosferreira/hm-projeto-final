@@ -14,6 +14,7 @@ private:
   int number_of_edges;
 
   std::vector<int> index2label;
+  std::vector<int> label2index;
   std::vector<std::vector<int>> adjacency_list;
   std::vector<std::vector<bool>> adjacency_matrix;
   void add_edge(int u, int v, bool directed = false);
@@ -35,6 +36,6 @@ public:
   std::vector<std::vector<int>> get_adjacency_list() const;
 };
 
-constexpr int NUM_MAX_VERTICES = 3500;
+constexpr int NUM_MAX_VERTICES = 4000;
 
 #endif

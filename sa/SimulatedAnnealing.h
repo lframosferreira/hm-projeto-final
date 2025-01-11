@@ -3,7 +3,10 @@
 
 #include "graph.h"
 #include <vector>
+#include <set>
 #include <random>
+
+using namespace std;
 
 
 class SimulatedAnnealing {
@@ -17,20 +20,24 @@ private:
     int m; // Size of the clique
     int n; // Number of vertices in the graph
 
-    std::vector<int> permutation;
-    std::vector<int> vertexDegrees;
+    vector<int> permutation;
+    vector<int> vertexDegrees;
 
-    std::mt19937 rng;
+    mt19937 rng;
 
     void initialize();
+    void initialize(vector<int> perm);
+    void setupDegrees();
     void adjustPermutation();
-    std::pair<int, int> selectVertices();
-    double computeObjectiveFunction(const std::vector<int>& perm);
+    pair<int, int> selectVertices();
+    double computeObjectiveFunction(const vector<int>& perm);
     double computePartialObjective(int vertexIndex);
     void performStateTransition(int u, int w);
     bool acceptNewState(double deltaF);
 
 public:
+    SimulatedAnnealing(double initialTemp, double endTemp, double coolingCoeff, Graph graph, int cliqueSize, std::vector<int> perm = {});
+
     SimulatedAnnealing(double initialTemp, double endTemp, double coolingCoeff, Graph graph, int cliqueSize);
     void run();
 };
