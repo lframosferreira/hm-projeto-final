@@ -6,7 +6,7 @@
 #include <unordered_set>
 #include <vector>
 
-TabuSearch::TabuSearch(Graph graph, const std::vector<int> &initialSolution,
+TabuSearch::TabuSearch(const Graph &graph, const std::vector<int> &initialSolution,
                        int maxTabuSize, int maxIterations)
     : graph(graph), currentSolution(initialSolution),
       bestSolution(initialSolution), maxTabuSize(maxTabuSize),
@@ -38,7 +38,7 @@ void TabuSearch::run() {
     }
 
     tabuList.push_back(currentSolution);
-    if (tabuList.size() > maxTabuSize) {
+    if ((int) tabuList.size() > maxTabuSize) {
       tabuList.pop_front();
     }
 
