@@ -1,7 +1,7 @@
 #ifndef SIMULATED_ANNEALING_H
 #define SIMULATED_ANNEALING_H
 
-#include "graph.h"
+#include "../graph/graph.h"
 #include <vector>
 #include <set>
 #include <random>
@@ -21,6 +21,7 @@ private:
     int n; // Number of vertices in the graph
 
     vector<int> permutation;
+	vector<int> initial_clique;
     vector<int> vertexDegrees;
 
     mt19937 rng;
@@ -39,7 +40,7 @@ public:
     SimulatedAnnealing(double initialTemp, double endTemp, double coolingCoeff, Graph graph, int cliqueSize, std::vector<int> perm = {});
 
     SimulatedAnnealing(double initialTemp, double endTemp, double coolingCoeff, Graph graph, int cliqueSize);
-    void run();
+    std::vector<int> run();
 };
 
 #endif // SIMULATED_ANNEALING_H

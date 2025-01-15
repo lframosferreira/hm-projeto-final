@@ -1,5 +1,5 @@
 #include "SimulatedAnnealing.h"
-#include "graph.h"
+#include "../graph/graph.h"
 #include <algorithm>
 #include <numeric>
 #include <iostream>
@@ -9,7 +9,7 @@
 
 SimulatedAnnealing::SimulatedAnnealing(double initialTemp, double endTemp, double coolingCoeff, Graph graph, int cliqueSize, vector<int> perm)
     : initialTemperature(initialTemp), endTemperature(endTemp), coolingCoefficient(coolingCoeff), currentTemperature(initialTemp),
-      graph(graph), m(cliqueSize), n(graph.get_number_of_vertices()), permutation(perm), rng(random_device{}()) {
+      graph(graph), m(cliqueSize), n(graph.get_number_of_vertices()), permutation(perm), initial_clique(perm), rng(random_device{}()) {
     
     initialize(perm);
     
@@ -120,7 +120,7 @@ bool SimulatedAnnealing::acceptNewState(double deltaF) {
     return dist(rng) < probability;
 }
 
-void SimulatedAnnealing::run() {
+std::vector<int> SimulatedAnnealing::run() {
     adjustPermutation();
     
     double currentF = computeObjectiveFunction(permutation);
@@ -150,8 +150,8 @@ void SimulatedAnnealing::run() {
     }
 
     cout << "Final objective function value: " << currentF << endl;
-
-    return vector<int>(permutation.begin(), permutation.begin() + m);
-
-    
+	if(currentF == 0)
+		return vector<int>(permutation.begin(), permutation.begin() + m);
+	else
+		return initial_clique;
 }

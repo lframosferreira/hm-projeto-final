@@ -9,7 +9,7 @@
 TabuSearch::TabuSearch(const Graph &graph, const std::vector<int> &initialSolution,
                        int maxTabuSize, int maxIterations)
     : graph(graph), currentSolution(initialSolution),
-      bestSolution(initialSolution), maxTabuSize(maxTabuSize),
+      bestSolution(initialSolution),bestClique(0), maxTabuSize(maxTabuSize),
       maxIterations(maxIterations) {}
 
 void TabuSearch::run() {
@@ -44,7 +44,7 @@ void TabuSearch::run() {
 
     currentIteration++;
   }
-
+  bestClique = bestFitness;
   std::cout << "Melhor clique encontrada: " << bestFitness << std::endl;
 }
 
@@ -117,3 +117,4 @@ bool TabuSearch::isClique(const std::vector<int> &solution) {
 }
 
 std::vector<int> TabuSearch::getBestSolution() const { return bestSolution; }
+int TabuSearch::getBestClique() const { return bestClique; }

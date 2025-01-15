@@ -11,6 +11,7 @@ private:
     const Graph &graph;
     std::vector<int> currentSolution;
     std::vector<int> bestSolution;
+	int bestClique;
     int maxTabuSize;
     int maxIterations;
 
@@ -23,6 +24,7 @@ public:
     TabuSearch(const Graph &graph, const std::vector<int>& initialSolution, int maxTabuSize, int maxIterations);
     void run();
     std::vector<int> getBestSolution() const;
+	int getBestClique() const;
 };
 
 #endif // TABU_SEARCH_H
