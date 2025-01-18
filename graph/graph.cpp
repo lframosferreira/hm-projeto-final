@@ -58,9 +58,9 @@ void Graph::print_to_stdout()
     }
     std::cout << std::endl;
   }
-  for (size_t i = 0; i < this->number_of_vertices; i++)
+  for (int i = 0; i < this->number_of_vertices; i++)
   {
-    for (size_t j = i + 1; j < this->number_of_vertices; j++)
+    for (int j = i + 1; j < this->number_of_vertices; j++)
     {
       std::cout << index2label.at(i) << " eh vizinho de " << index2label.at(j) << ": " << (this->is_edge(i, j) ? "Sim" : "Não") << std::endl;
     }
@@ -130,7 +130,7 @@ void Graph::sort_adjacency_list()
     this->index2label[i] = indexed_list[i].second + 1;
     this->label2index[indexed_list[i].second + 1] = i;
   }
-  for (auto const [neighbours, label_minus_1] : indexed_list)
+  for (auto const& [neighbours, label_minus_1] : indexed_list)
   {
     this->adjacency_list[this->label2index[label_minus_1 + 1]].clear();
     for (auto const neighbour : neighbours)
@@ -185,7 +185,7 @@ int Graph::get_vertex_with_lowest_degree()
   int vertex = -1;
   for (int i = 0; i < this->get_number_of_vertices(); ++i)
   {
-    if (this->adjacency_list[i].size() < min_degree)
+    if ((int) this->adjacency_list[i].size() < min_degree)
     {
       min_degree = this->adjacency_list[i].size();
       vertex = i;

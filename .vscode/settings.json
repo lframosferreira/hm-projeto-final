@@ -65,5 +65,6 @@
         "stop_token": "cpp",
         "thread": "cpp",
         "cinttypes": "cpp"
-    }
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }

@@ -71,7 +71,7 @@ void GeneticAlgorithm::mutate(std::bitset<NUM_MAX_VERTICES> &individual)
 
 void GeneticAlgorithm::generate_offspring(std::vector<std::bitset<NUM_MAX_VERTICES>> &prev_population)
 {
-    while (prev_population.size() < 2 * population_size)
+    while ((int) prev_population.size() < 2 * population_size)
     {
         int idx_parent1 = gen() % population_size;
         int idx_parent2 = gen() % population_size;
@@ -82,7 +82,9 @@ void GeneticAlgorithm::generate_offspring(std::vector<std::bitset<NUM_MAX_VERTIC
 
         if (this->crossover_probability < dist(gen))
         {
-            auto [child1, child2] = crossover(parent1, parent2);
+            auto [c1, c2] = crossover(parent1, parent2);
+            child1 = c1;
+            child2 = c2;
         }
         else
         {
@@ -107,7 +109,7 @@ void GeneticAlgorithm::generate_offspring(std::vector<std::bitset<NUM_MAX_VERTIC
 void GeneticAlgorithm::select_new_population(std::vector<std::bitset<NUM_MAX_VERTICES>> &parents_and_offspring)
 {
     std::vector<int> fitnesses(2 * population_size);
-    for (size_t i = 0; i < 2 * population_size; i++)
+    for (int i = 0; i < 2 * population_size; i++)
     {
         fitnesses[i] = fitness(parents_and_offspring[i]);
     }
@@ -171,7 +173,7 @@ void GeneticAlgorithm::repair_clique(std::bitset<NUM_MAX_VERTICES> &individual)
         int vertex_to_remove = -1;
         for (const auto &[vertex, neighbour_list] : neighbours)
         {
-            if (neighbour_list.size() < min_degree)
+            if ((int) neighbour_list.size() < min_degree)
             {
                 min_degree = neighbour_list.size();
                 vertex_to_remove = vertex;
@@ -219,7 +221,7 @@ std::vector<int> GeneticAlgorithm::run()
     std::bitset<NUM_MAX_VERTICES> best_individual;
     int best_fitness = 0;
 
-    for (size_t i = 0; i < population_size; i++)
+    for (int i = 0; i < population_size; i++)
     {
         int f = fitness(population[i]);
         if (f >= best_fitness)

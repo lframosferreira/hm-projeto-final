@@ -16,8 +16,8 @@ class GeneticAlgorithm
 private:
     const Graph &graph;
     int population_size;
-    double mutation_probability;
     double crossover_probability;
+    double mutation_probability;
     int generations;
 
     std::vector<std::bitset<NUM_MAX_VERTICES>> population; // Population of bitsets
