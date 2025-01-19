@@ -48,7 +48,7 @@ void test(const std::string &graph_file, int num_executions, const std::string &
 		std::cout << "Running genetic algorithm..." << std::endl;
 		std::vector<int> clique = ga.run();
 		int clique_size_ga = clique.size();
-
+		std::cout << "Clique size ga: " << clique_size_ga << std::endl;
 		SimulatedAnnealing sa(100.0, 0.001, 0.9995, g, 34, clique);
 		std::cout << "Running simulated annealing algorithm..." << std::endl;
 		clique = sa.run();
@@ -109,8 +109,8 @@ int main(int argc, char **argv)
 	}
 
 	std::string directory_path = argv[1];
-	int num_executions = 20;				// Exemplo de número de execuções
-	std::string output_file = "output.csv"; // Exemplo de arquivo de output
+	int num_executions = 20;
+	std::string output_file = "output2.csv";
 
 	test_all_files_in_directory(directory_path, num_executions, output_file);
 

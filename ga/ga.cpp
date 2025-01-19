@@ -160,7 +160,7 @@ void GeneticAlgorithm::repair_clique(std::bitset<NUM_MAX_VERTICES> &individual)
     {
         for (size_t j = i + 1; j < vertices.size(); ++j)
         {
-            if (!graph.is_edge(vertices[i], vertices[j]))
+            if (graph.is_edge(vertices[i], vertices[j]))
             {
                 neighbours[vertices[i]].push_back(vertices[j]);
                 neighbours[vertices[j]].push_back(vertices[i]);
@@ -198,8 +198,6 @@ GeneticAlgorithm::GeneticAlgorithm(const Graph &g, int pop_size, double crossove
 std::vector<int> GeneticAlgorithm::run()
 {
     int num_vertices = graph.get_number_of_vertices();
-    std::cout << "Number of vertices: " << num_vertices << std::endl;
-    // Initialize population
     population.clear();
     population.resize(population_size);
     auto start = std::chrono::high_resolution_clock::now();
