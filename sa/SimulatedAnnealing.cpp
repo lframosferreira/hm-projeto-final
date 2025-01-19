@@ -1,10 +1,5 @@
 #include "SimulatedAnnealing.h"
-#include "../graph/graph.h"
-#include <algorithm>
-#include <numeric>
-#include <iostream>
-#include <random>
-#include <cmath>
+
 
 
 SimulatedAnnealing::SimulatedAnnealing(double initialTemp, double endTemp, double coolingCoeff, Graph graph, int cliqueSize, vector<int> perm)

@@ -3,48 +3,116 @@
 #include "../sa/SimulatedAnnealing.h"
 #include <cstdlib>
 #include <string>
+#include <filesystem>
 #include <chrono>
 #include <iostream>
+#include <string>
+#include <fstream>
+#include <dirent.h>
+
+std::string extract_file_name(const std::string &file_path)
+{
+	// Encontra a posição do último separador de diretório
+	size_t last_slash_pos = file_path.find_last_of("/\\");
+	// Extrai o nome do arquivo com extensão
+	std::string file_name = file_path.substr(last_slash_pos + 1);
+	// Encontra a posição do último ponto
+	size_t last_dot_pos = file_name.find_last_of(".");
+	// Remove a extensão
+	if (last_dot_pos != std::string::npos)
+	{
+		file_name = file_name.substr(0, last_dot_pos);
+	}
+	return file_name;
+}
+
+void test(const std::string &graph_file, int num_executions, const std::string &output_file)
+{
+	std::ofstream out(output_file, std::ios::app);
+	if (!out.is_open())
+	{
+		std::cerr << "Erro ao abrir o arquivo de output: " << output_file << std::endl;
+		return;
+	}
+	std::string graph_file_pretty = extract_file_name(graph_file);
+	Graph g;
+	g.read_edge_list(graph_file);
+
+	int best_clique = 0;
+	double total_time = 0.0;
+	for (int i = 0; i < num_executions; ++i)
+	{
+		auto start = std::chrono::high_resolution_clock::now();
+
+		GeneticAlgorithm ga(g, 100, 0.9, 0.1, 100);
+		std::cout << "Running genetic algorithm..." << std::endl;
+		std::vector<int> clique = ga.run();
+		int clique_size_ga = clique.size();
+
+		SimulatedAnnealing sa(100.0, 0.001, 0.9995, g, 34, clique);
+		std::cout << "Running simulated annealing algorithm..." << std::endl;
+		clique = sa.run();
+		int clique_size_sa = clique.size();
+
+		TabuSearch ts(g, clique, 10, 100);
+		std::cout << "Running tabu search..." << std::endl;
+		ts.run();
+		std::cout << "Done" << std::endl;
+
+		int cur_clique = ts.getBestClique();
+		if (cur_clique > best_clique)
+		{
+			best_clique = cur_clique;
+		}
+		auto end = std::chrono::high_resolution_clock::now();
+
+		total_time += std::chrono::duration<double>(end - start).count();
+		double exec_time = std::chrono::duration<double>(end - start).count();
+
+		out << (i + 1) << "," << graph_file_pretty << "," << clique_size_ga << ","
+			<< clique_size_sa << "," << cur_clique << "," << exec_time << std::endl;
+	}
+	std::cout << "Melhor clique em 20 execucoes = " << best_clique << std::endl;
+	std::cout << "Tempo de execucao total: " << total_time << " seconds" << std::endl;
+}
+
+void test_all_files_in_directory(const std::string &directory_path, int num_executions, const std::string &output_file)
+{
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir(directory_path.c_str())) != NULL)
+	{
+		while ((ent = readdir(dir)) != NULL)
+		{
+			std::string file_name = ent->d_name;
+			if (file_name != "." && file_name != "..")
+			{
+				std::string file_path = directory_path + "/" + file_name;
+				std::cout << "Testing file: " << file_path << std::endl;
+				test(file_path, num_executions, output_file);
+			}
+		}
+		closedir(dir);
+	}
+	else
+	{
+		std::cerr << "Erro ao abrir o diretório: " << directory_path << std::endl;
+	}
+}
 
 int main(int argc, char **argv)
 {
-  if (argc != 2)
-  {
-    std::cerr << "Usage: " << argv[0] << " <graph file>" << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  std::string filename = argv[1];
+	if (argc != 2)
+	{
+		std::cerr << "Usage: " << argv[0] << " <directory path>" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 
-  Graph g;
-  g.read_edge_list(filename);
-  std::cout << filename << std::endl;
-  
-  const int num_executions = 20;
-  int best_clique = 0;
-  double total_time = 0.0;
-  for (int i = 0; i < num_executions; ++i)
-  {
-	  auto start = std::chrono::high_resolution_clock::now();
-	  GeneticAlgorithm ga(g, 100, 0.9, 0.1, 100);
-	  std::cout << "Running genetic algorithm..." << std::endl;
-	  std::vector<int> clique = ga.run();
-	  std::cout << "Clique size (ga): " << clique.size() << std::endl;
-	  SimulatedAnnealing sa(100.0, 0.001, 0.9995, g, 34,clique);
-	  std::cout << "Running simulated annealing algorithm..." << std::endl;
-	  clique = sa.run();
-	  TabuSearch ts(g, clique, 10, 100);
-	  std::cout << "Running tabu search..." << std::endl;
-	  ts.run();
-	  std::cout << "Done" << std::endl;
-	  int cur_clique = ts.getBestClique();
-	  if (cur_clique > best_clique)
-	  {
-		best_clique = cur_clique;
-	  }
-	  auto end = std::chrono::high_resolution_clock::now();
-	  total_time += std::chrono::duration<double>(end - start).count();
-  }
-  std::cout << "Melhor clique em 20 execucoes = " << best_clique << std::endl;
-  std::cout << "Tempo de execucao medio: " << total_time / num_executions << " seconds" << std::endl;
-  exit(EXIT_SUCCESS);
+	std::string directory_path = argv[1];
+	int num_executions = 20;				// Exemplo de número de execuções
+	std::string output_file = "output.csv"; // Exemplo de arquivo de output
+
+	test_all_files_in_directory(directory_path, num_executions, output_file);
+
+	return 0;
 }

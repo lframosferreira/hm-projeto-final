@@ -10,8 +10,9 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": null,
-            "intelliSenseMode": "windows-gcc-x86"
+            "compilerPath": "/usr/bin/g++",
+            "intelliSenseMode": "windows-gcc-x86",
+            "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],
     "version": 4

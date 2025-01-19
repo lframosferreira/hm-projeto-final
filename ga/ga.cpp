@@ -209,13 +209,12 @@ std::vector<int> GeneticAlgorithm::run()
     }
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
-    std::cout << "Initialization time: " << elapsed_seconds.count() << "s" << std::endl;
-    std::cout << "Population size: " << population.size() << std::endl;
 
     // Evolution loop
     for (int generation = 0; generation < generations; ++generation)
     {
-        std::cout << "Generation " << generation << std::endl;
+        if(generation % 10 == 0)
+            std::cout << "Generation " << generation << std::endl;
         next_generation();
     }
     std::bitset<NUM_MAX_VERTICES> best_individual;

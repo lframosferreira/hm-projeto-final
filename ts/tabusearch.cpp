@@ -18,7 +18,8 @@ void TabuSearch::run() {
   int bestFitness = computeObjectiveFunction(bestSolution);
 
   while (currentIteration < maxIterations) {
-    std::cout << "Iteration: " << currentIteration << std::endl;
+    if(currentIteration % 10 == 0)
+      std::cout << "Iteration: " << currentIteration << std::endl;
     std::vector<std::vector<int>> neighborhood =
         generateNeighborhood(currentSolution, tabuList);
 

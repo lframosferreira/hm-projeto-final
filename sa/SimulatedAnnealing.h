@@ -5,7 +5,11 @@
 #include <vector>
 #include <set>
 #include <random>
-
+#include <algorithm>
+#include <numeric>
+#include <iostream>
+#include <random>
+#include <cmath>
 using namespace std;
 
 
