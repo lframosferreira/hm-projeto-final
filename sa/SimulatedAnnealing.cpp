@@ -75,11 +75,10 @@ pair<int, int> SimulatedAnnealing::selectVertices() {
 
 double SimulatedAnnealing::computeObjectiveFunction(const vector<int>& perm) {
     double score = 0;
-    adj_list_t adjacency_list = graph.get_adjacency_list();
     for (int i = 0; i < m-1; i++) {
         for (int j = i + 1; j < m; j++) {
             int u = perm[i], v = perm[j];
-            if (find(adjacency_list[u].begin(), adjacency_list[u].end(), v) == adjacency_list[u].end()) {
+            if (!graph.is_edge(u, v)){
                 score += 1;
             }
         }
@@ -90,14 +89,14 @@ double SimulatedAnnealing::computeObjectiveFunction(const vector<int>& perm) {
 
 double SimulatedAnnealing::computePartialObjective(int vertexIndex) {
     double score = 0;
-    adj_list_t adjacency_list = graph.get_adjacency_list();
     for (int i = 0; i < m; ++i) {
         if (i != vertexIndex) {
             int u = permutation[vertexIndex];
             int v = permutation[i];
-            if (find(adjacency_list[u].begin(), adjacency_list[u].end(), v) != adjacency_list[u].end()) {
+            if (graph.is_edge(u, v)){
                 score += 1;
             }
+            
         }
     }
     return score;
@@ -133,6 +132,10 @@ std::vector<int> SimulatedAnnealing::maximum_clique() {
 
 
     while (currentTemperature > endTemperature) {
+        if (currentF == 0) {
+            last_clique = vector<int>(permutation.begin(), permutation.begin() + m);
+            break; // Solution found
+        }
         auto [u, w] = selectVertices();
         performStateTransition(u, w);
 
@@ -147,18 +150,12 @@ std::vector<int> SimulatedAnnealing::maximum_clique() {
 
 
         currentTemperature *= coolingCoefficient;
-        // cout << currentF<<endl;
 
-        if (currentF == 0) {
-            last_clique = vector<int>(permutation.begin(), permutation.begin() + m);
-            break; // Solution found
-        }
     }
 
     cout << "Final objective function value: " << currentF <<" clique size: "<< m<< endl;
 	if(currentF == 0)
 		return vector<int>(permutation.begin(), permutation.begin() + m);
-    
 	else
 		return last_clique;
 }
