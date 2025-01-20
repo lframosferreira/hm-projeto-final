@@ -19,13 +19,14 @@ private:
     double endTemperature;
     double coolingCoefficient;
     double currentTemperature;
+    double currentF;
 
     Graph graph;
     int m; // Size of the clique
     int n; // Number of vertices in the graph
 
     vector<int> permutation;
-	vector<int> initial_clique;
+	vector<int> last_clique;
     vector<int> vertexDegrees;
 
     mt19937 rng;
@@ -44,7 +45,9 @@ public:
     SimulatedAnnealing(double initialTemp, double endTemp, double coolingCoeff, Graph graph, int cliqueSize, std::vector<int> perm = {});
 
     SimulatedAnnealing(double initialTemp, double endTemp, double coolingCoeff, Graph graph, int cliqueSize);
+
     std::vector<int> run();
+    std::vector<int> maximum_clique();
 };
 
 #endif // SIMULATED_ANNEALING_H

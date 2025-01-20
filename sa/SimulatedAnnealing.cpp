@@ -4,7 +4,7 @@
 
 SimulatedAnnealing::SimulatedAnnealing(double initialTemp, double endTemp, double coolingCoeff, Graph graph, int cliqueSize, vector<int> perm)
     : initialTemperature(initialTemp), endTemperature(endTemp), coolingCoefficient(coolingCoeff), currentTemperature(initialTemp),
-      graph(graph), m(cliqueSize), n(graph.get_number_of_vertices()), permutation(perm), initial_clique(perm), rng(random_device{}()) {
+      graph(graph), m(cliqueSize), n(graph.get_number_of_vertices()), permutation(perm), last_clique(perm), rng(random_device{}()) {
     
     initialize(perm);
     
@@ -18,6 +18,7 @@ SimulatedAnnealing::SimulatedAnnealing(double initialTemp, double endTemp, doubl
 }
 
 void SimulatedAnnealing::initialize() {
+    last_clique = {};
     permutation.resize(n);
     iota(permutation.begin(), permutation.end(), 0);
     random_device rd;
@@ -115,12 +116,21 @@ bool SimulatedAnnealing::acceptNewState(double deltaF) {
     return dist(rng) < probability;
 }
 
-std::vector<int> SimulatedAnnealing::run() {
-    adjustPermutation();
-    
-    double currentF = computeObjectiveFunction(permutation);
+std::vector<int> SimulatedAnnealing::run(){
+    currentF = 0;
+    vector<int> perm;
 
-    cout << currentF << endl;
+    while (currentF == 0){
+        perm = maximum_clique();
+        m+=1;
+    }
+    return perm;
+}
+
+std::vector<int> SimulatedAnnealing::maximum_clique() {
+    
+    currentF = computeObjectiveFunction(permutation);
+
 
     while (currentTemperature > endTemperature) {
         auto [u, w] = selectVertices();
@@ -137,16 +147,19 @@ std::vector<int> SimulatedAnnealing::run() {
 
 
         currentTemperature *= coolingCoefficient;
-        // cout << currentTemperature<<endl;
+        // cout << currentF<<endl;
 
         if (currentF == 0) {
+            last_clique = vector<int>(permutation.begin(), permutation.begin() + m);
             break; // Solution found
         }
     }
 
-    cout << "Final objective function value: " << currentF << endl;
+    cout << "Final objective function value: " << currentF <<" clique size: "<< m<< endl;
 	if(currentF == 0)
 		return vector<int>(permutation.begin(), permutation.begin() + m);
+    
 	else
-		return initial_clique;
+		return last_clique;
 }
+

@@ -49,17 +49,19 @@ void test(const std::string &graph_file, int num_executions, const std::string &
 		std::vector<int> clique = ga.run();
 		int clique_size_ga = clique.size();
 		std::cout << "Clique size ga: " << clique_size_ga << std::endl;
-		SimulatedAnnealing sa(100.0, 0.001, 0.9995, g, 34, clique);
+		SimulatedAnnealing sa(100.0, 0.001, 0.9995, g, clique_size_ga, clique);
 		std::cout << "Running simulated annealing algorithm..." << std::endl;
 		clique = sa.run();
 		int clique_size_sa = clique.size();
+		std::cout << "Clique size sa: " << clique_size_sa << std::endl;
 
-		TabuSearch ts(g, clique, 10, 100);
 		std::cout << "Running tabu search..." << std::endl;
+		TabuSearch ts(g, clique, 10, 100);
 		ts.run();
-		std::cout << "Done" << std::endl;
 
 		int cur_clique = ts.getBestClique();
+		std::cout << "Clique size ts: " << cur_clique << std::endl;
+		std::cout << "Done" << std::endl;
 		if (cur_clique > best_clique)
 		{
 			best_clique = cur_clique;
