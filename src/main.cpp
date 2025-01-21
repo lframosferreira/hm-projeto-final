@@ -65,7 +65,7 @@ void control_test(const std::string &graph_file, int num_executions, const std::
 	std::cout << "Tempo de execucao total: " << total_time << " seconds" << std::endl;
 }
 
-void test(const std::string &graph_file, int num_executions, const std::string &output_file)
+void grid_search_ga(const std::string &graph_file, int num_executions, const std::string &output_file)
 {
 	std::ofstream out(output_file, std::ios::app);
 	if (!out.is_open())
@@ -120,7 +120,7 @@ void test_all_files_in_directory(const std::string &directory_path, int num_exec
 			{
 				std::string file_path = directory_path + "/" + file_name;
 				std::cout << "Testing file: " << file_path << std::endl;
-				test(file_path, num_executions, output_file);
+				grid_search_ga(file_path, num_executions, output_file);
 			}
 		}
 		closedir(dir);
