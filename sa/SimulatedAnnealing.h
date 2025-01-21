@@ -42,7 +42,7 @@ private:
     bool acceptNewState(double deltaF);
 
 public:
-    SimulatedAnnealing(double initialTemp, double endTemp, double coolingCoeff, Graph graph, int cliqueSize, std::vector<int> perm = {});
+    SimulatedAnnealing(double initialTemp, double endTemp, double coolingCoeff, Graph graph, int cliqueSize, std::vector<int> perm);
 
     SimulatedAnnealing(double initialTemp, double endTemp, double coolingCoeff, Graph graph, int cliqueSize);
 
