@@ -53,15 +53,14 @@ std::vector<std::vector<int>>
 TabuSearch::generateNeighborhood(const std::vector<int> &solution,
                                  const std::deque<std::vector<int>> &tabuList) {
   std::vector<std::vector<int>> neighbors;
-  adj_list_t adjacencyList = graph.get_adjacency_list();
+  int numVertices = graph.get_number_of_vertices();
 
-  for (int i = 0; i < graph.get_number_of_vertices(); ++i) {
-    if (std::find(solution.begin(), solution.end(), i) == solution.end()) {
+  for (int i = 0; i < numVertices; ++i) {
+    if(std::find(solution.begin(), solution.end(), i) == solution.end()) {
       std::vector<int> newSolution = solution;
       newSolution.push_back(i);
 
-      if ((std::find(tabuList.begin(), tabuList.end(), newSolution) ==
-               tabuList.end() ||
+      if ((std::find(tabuList.begin(), tabuList.end(), newSolution) == tabuList.end() ||
            computeObjectiveFunction(newSolution) >
                computeObjectiveFunction(bestSolution)) &&
           isClique(newSolution)) {
@@ -106,7 +105,6 @@ int TabuSearch::computeObjectiveFunction(const std::vector<int> &solution) {
 }
 
 bool TabuSearch::isClique(const std::vector<int> &solution) {
-  adj_list_t adjacencyList = graph.get_adjacency_list();
   for (size_t i = 0; i < solution.size(); ++i) {
     for (size_t j = i + 1; j < solution.size(); ++j) {
       if (!graph.is_edge(solution[i], solution[j])) {
