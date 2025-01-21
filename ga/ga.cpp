@@ -110,6 +110,7 @@ void GeneticAlgorithm::generate_offspring(std::vector<std::bitset<NUM_MAX_VERTIC
 void GeneticAlgorithm::select_new_population(std::vector<std::bitset<NUM_MAX_VERTICES>> &parents_and_offspring)
 {
     std::vector<int> fitnesses(2 * population_size);
+#pragma omp parallel for
     for (int i = 0; i < 2 * population_size; i++)
     {
         fitnesses[i] = fitness(parents_and_offspring[i]);
@@ -172,13 +173,7 @@ void GeneticAlgorithm::repair_clique(std::bitset<NUM_MAX_VERTICES> &individual)
     }
     while (!is_clique(vertices))
     {
-        // assert(vertices.size() == neighbours.size() and "ERROR: Invalid clique");
-        /* if(vertices.size() != neighbours.size())
-        {
-            std::cout << "ERROR: Invalid clique" << std::endl;
-            std::cout << vertices.size() << std::endl;
-            std::cout << neighbours.size() << std::endl;
-        } */
+        assert(vertices.size() == neighbours.size() and "ERROR: Invalid clique");
         int min_degree = graph.get_number_of_vertices() + 10;
         int vertex_to_remove = -1;
         for (const auto &[vertex, neighbour_list] : neighbours)
@@ -212,10 +207,6 @@ void GeneticAlgorithm::repair_clique(std::bitset<NUM_MAX_VERTICES> &individual)
                                                 [vertex_to_remove](int v)
                                                 { return v == vertex_to_remove; }),
                                  neighbour_list.end());
-            if (neighbour_list.size() == 0)
-            {
-                neighbours.erase(vertex);
-            }
         }
     }
 }
@@ -230,16 +221,11 @@ std::vector<int> GeneticAlgorithm::run()
     int num_vertices = graph.get_number_of_vertices();
     population.clear();
     population.resize(population_size);
-    auto start = std::chrono::high_resolution_clock::now();
-
-#pragma omp parallel for
+    #pragma omp parallel for
     for (int i = 0; i < population_size; ++i)
     {
         population[i] = random_individual(num_vertices);
     }
-
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed_seconds = end - start;
 
     // Evolution loop
     for (int generation = 0; generation < generations; ++generation)

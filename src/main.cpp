@@ -42,21 +42,24 @@ void test(const std::string &graph_file, int num_executions, const std::string &
 	double total_time = 0.0;
 	for (int i = 0; i < num_executions; ++i)
 	{
-		auto start = std::chrono::high_resolution_clock::now();
+		// auto start = std::chrono::high_resolution_clock::now();
 
 		GeneticAlgorithm ga(g, 100, 0.9, 0.1, 100);
 		std::cout << "Running genetic algorithm..." << std::endl;
 		std::vector<int> clique = ga.run();
 		int clique_size_ga = clique.size();
 		std::cout << "Clique size ga: " << clique_size_ga << std::endl;
-		SimulatedAnnealing sa(100.0, 0.001, 0.9995, g, clique_size_ga, clique);
+		// double exec_time_ga = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start).count();
+
+		/* SimulatedAnnealing sa(100.0, 0.001, 0.9995, g, clique_size_ga, clique);
 		std::cout << "Running simulated annealing algorithm..." << std::endl;
 		clique = sa.run();
 		int clique_size_sa = clique.size();
 		std::cout << "Clique size sa: " << clique_size_sa << std::endl;
+		double exec_time_sa = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start).count();
 
-		std::cout << "Running tabu search..." << std::endl;
 		TabuSearch ts(g, clique, 10, 100);
+		std::cout << "Running tabu search..." << std::endl;
 		ts.run();
 
 		int cur_clique = ts.getBestClique();
@@ -71,10 +74,13 @@ void test(const std::string &graph_file, int num_executions, const std::string &
 		total_time += std::chrono::duration<double>(end - start).count();
 		double exec_time = std::chrono::duration<double>(end - start).count();
 
-		out << (i + 1) << "," << graph_file_pretty << "," << clique_size_ga << ","
-			<< clique_size_sa << "," << cur_clique << "," << exec_time << std::endl;
+		out << (i + 1) << "," << graph_file_pretty << ","
+		<< clique_size_ga << "," << clique_size_sa << "," << cur_clique
+		<< "," << exec_time_ga << "," << exec_time_sa << "," << exec_time
+			<< std::endl; */
+		// out << (i + 1) << "," << graph_file_pretty << "," << clique_size_ga << "," << exec_time_ga << std::endl;
 	}
-	std::cout << "Melhor clique em 20 execucoes = " << best_clique << std::endl;
+	std::cout << "Melhor clique em " << num_executions << " execucoes = " << best_clique << std::endl;
 	std::cout << "Tempo de execucao total: " << total_time << " seconds" << std::endl;
 }
 
