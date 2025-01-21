@@ -18,14 +18,15 @@ std::bitset<NUM_MAX_VERTICES> GeneticAlgorithm::random_individual(int num_vertic
 // Fitness function: return clique size if valid, otherwise 0
 int GeneticAlgorithm::fitness(const std::bitset<NUM_MAX_VERTICES> &ind)
 {
+
     std::vector<int> vertices;
     for (int i = 0; i < graph.get_number_of_vertices(); ++i)
     {
         if (ind[i])
             vertices.push_back(i);
     }
-    assert(is_clique(vertices) and "ERROR: Invalid clique");
-    return is_clique(vertices) ? vertices.size() : 0;
+    assert(is_clique(vertices) and (vertices.size() == ind.count()) and "ERROR: Invalid clique");
+    return ind.count();
 }
 
 // Check if the selected vertices form a clique in the graph
@@ -71,7 +72,7 @@ void GeneticAlgorithm::mutate(std::bitset<NUM_MAX_VERTICES> &individual)
 
 void GeneticAlgorithm::generate_offspring(std::vector<std::bitset<NUM_MAX_VERTICES>> &prev_population)
 {
-    while ((int) prev_population.size() < 2 * population_size)
+    while ((int)prev_population.size() < 2 * population_size)
     {
         int idx_parent1 = gen() % population_size;
         int idx_parent2 = gen() % population_size;
@@ -166,26 +167,55 @@ void GeneticAlgorithm::repair_clique(std::bitset<NUM_MAX_VERTICES> &individual)
                 neighbours[vertices[j]].push_back(vertices[i]);
             }
         }
+        if (neighbours.find(vertices[i]) == neighbours.end())
+            neighbours[vertices[i]] = std::vector<int>();
     }
     while (!is_clique(vertices))
     {
-        int min_degree = graph.get_number_of_vertices();
+        // assert(vertices.size() == neighbours.size() and "ERROR: Invalid clique");
+        /* if(vertices.size() != neighbours.size())
+        {
+            std::cout << "ERROR: Invalid clique" << std::endl;
+            std::cout << vertices.size() << std::endl;
+            std::cout << neighbours.size() << std::endl;
+        } */
+        int min_degree = graph.get_number_of_vertices() + 10;
         int vertex_to_remove = -1;
         for (const auto &[vertex, neighbour_list] : neighbours)
         {
-            if ((int) neighbour_list.size() < min_degree)
+            if ((int)neighbour_list.size() < min_degree)
             {
                 min_degree = neighbour_list.size();
                 vertex_to_remove = vertex;
             }
         }
+        if (vertex_to_remove == -1)
+        {
+            std::cout << "ERROR: No vertex to remove" << std::endl;
+            std::cout << vertices.size() << std::endl;
+            std::cout << neighbours.size() << std::endl;
+            std::cout << min_degree << std::endl;
+            std::cout << "Vertices:" << std::endl;
+            for (const auto &[vertex, neighbour_list] : neighbours)
+            {
+                std::cout << vertex << " " << neighbour_list.size() << std::endl;
+            }
+        }
         assert(vertex_to_remove != -1 and "ERROR: No vertex to remove");
+
         individual[vertex_to_remove] = 0;
         vertices.erase(std::remove(vertices.begin(), vertices.end(), vertex_to_remove), vertices.end());
         neighbours.erase(vertex_to_remove);
         for (auto &[vertex, neighbour_list] : neighbours)
         {
-            neighbour_list.erase(std::remove(neighbour_list.begin(), neighbour_list.end(), vertex_to_remove), neighbour_list.end());
+            neighbour_list.erase(std::remove_if(neighbour_list.begin(), neighbour_list.end(),
+                                                [vertex_to_remove](int v)
+                                                { return v == vertex_to_remove; }),
+                                 neighbour_list.end());
+            if (neighbour_list.size() == 0)
+            {
+                neighbours.erase(vertex);
+            }
         }
     }
 }
@@ -201,17 +231,20 @@ std::vector<int> GeneticAlgorithm::run()
     population.clear();
     population.resize(population_size);
     auto start = std::chrono::high_resolution_clock::now();
-    #pragma omp parallel for
-    for (int i = 0; i < population_size; ++i) {
+
+#pragma omp parallel for
+    for (int i = 0; i < population_size; ++i)
+    {
         population[i] = random_individual(num_vertices);
     }
+
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
 
     // Evolution loop
     for (int generation = 0; generation < generations; ++generation)
     {
-        if(generation % 10 == 0)
+        if (generation % 10 == 0)
             std::cout << "Generation " << generation << std::endl;
         next_generation();
     }
