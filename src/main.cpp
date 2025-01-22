@@ -80,6 +80,7 @@ void test(const std::string &graph_file, int num_executions, const std::string &
 
 	int best_clique = 0;
 	double total_time = 0.0;
+	out << ",graph_file_pretty,clique_size_ga,clique_size_sa,cur_clique,exec_time,exec_time_ga,exec_time_sa,exec_time_ts\n"; // columns names
 	for (int i = 0; i < num_executions; ++i)
 	{
 		auto start = std::chrono::high_resolution_clock::now();
@@ -145,6 +146,7 @@ void grid_search_ga(const std::string &graph_file, int num_executions, const std
 	std::vector<double> list_pms = {0.3, 0.2, 0.1};
 	std::vector<int> list_pop = {100, 200, 300};
 	std::vector<int> list_gens = {100, 200, 300};
+	out << ",graph_file_pretty,clique_size_ga,exec_time_ga,pc,pm,pop,gens\n"; // column names
 	for (auto const pc : list_pcs)
 	{
 		for (auto const pm : list_pms)
@@ -205,7 +207,7 @@ int main(int argc, char **argv)
 
 	std::string directory_path = argv[1];
 	int num_executions = 20;
-	std::string output_file = "heruristics_test.csv";
+	std::string output_file = "heuristics_test.csv";
 
 	test_all_files_in_directory(directory_path, num_executions, output_file);
 
