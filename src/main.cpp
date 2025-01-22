@@ -77,11 +77,10 @@ void grid_search_ga(const std::string &graph_file, int num_executions, const std
 	Graph g;
 	g.read_edge_list(graph_file);
 
-	std::vector<double> list_pcs = {0.1, 0.3, 0.5, 0.7, 0.9};
-	std::vector<double> list_pms = {0.1, 0.3, 0.5, 0.7, 0.9};
-	std::vector<int> list_pop = {50, 100, 200, 300};
-	std::vector<int> list_gens = {50, 100, 200, 300};
-	auto start = std::chrono::high_resolution_clock::now();
+	std::vector<double> list_pcs = {0.9, 0.8, 0.7};
+	std::vector<double> list_pms = {0.3, 0.2, 0.1};
+	std::vector<int> list_pop = {100, 200, 300};
+	std::vector<int> list_gens = {100, 200, 300};
 	for (auto const pc : list_pcs)
 	{
 		for (auto const pm : list_pms)
@@ -92,6 +91,7 @@ void grid_search_ga(const std::string &graph_file, int num_executions, const std
 				{
 					for (int i = 0; i < num_executions; ++i)
 					{
+						auto start = std::chrono::high_resolution_clock::now();
 						GeneticAlgorithm ga(g, pop, pc, pm, gens);
 						std::cout << "Running genetic algorithm..." << std::endl;
 						std::vector<int> clique = ga.run();
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
 	}
 
 	std::string directory_path = argv[1];
-	int num_executions = 20;
+	int num_executions = 5;
 	std::string output_file = "grid_search_ga.csv";
 
 	test_all_files_in_directory(directory_path, num_executions, output_file);
